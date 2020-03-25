@@ -34,14 +34,16 @@ class FormData {
   }
 
   /// Create FormData instance with a Map.
-  FormData.fromMap(Map<String, dynamic> map) {
+  FormData.fromMap(Map<String, dynamic> map, {bool removeFilesPrefix}) {
     _init();
     encodeMap(
       map,
       (key, value) {
         if (value == null) return null;
         if (value is MultipartFile) {
-          files.add(MapEntry(key, value));
+          files.add(MapEntry(
+              removeFilesPrefix != true ? key : key.replaceAll('[]', ''),
+              value));
         } else {
           fields.add(MapEntry(key, value.toString()));
         }
@@ -154,6 +156,6 @@ class FormData {
 
   ///Transform the entire FormData contents as a list of bytes asynchronously.
   Future<List<int>> readAsBytes() {
-    return Future(()=>finalize().reduce((a, b) => [...a, ...b]));
+    return Future(() => finalize().reduce((a, b) => [...a, ...b]));
   }
 }
